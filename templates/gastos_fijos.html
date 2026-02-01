@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gastos fijos</title>
+</head>
+<body>
+
+<h1>Gastos fijos</h1>
+
+<p><a href="/">⬅ Volver al mes actual</a></p>
+
+{% with mensajes = get_flashed_messages() %}
+  {% if mensajes %}
+    <ul style="color: red;">
+      {% for m in mensajes %}
+        <li>⚠️ {{ m }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<h2>Añadir gasto fijo</h2>
+
+<form method="post" action="/añadir_gasto_fijo">
+    <input name="descripcion" placeholder="Descripción" required>
+    <input name="importe" type="number" step="0.01" required>
+    <button>Añadir gasto fijo</button>
+</form>
+
+<hr>
+
+<h2>Lista de gastos fijos</h2>
+
+<ul>
+{% for g in gastos_fijos %}
+    <li>
+        {{ g.descripcion }} — {{ g.importe }} €
+        <a href="/editar_gasto_fijo/{{ loop.index0 }}">✏️</a>
+        <a href="/eliminar_gasto_fijo/{{ loop.index0 }}"
+           onclick="return confirm('¿Eliminar este gasto fijo?')">❌</a>
+    </li>
+{% else %}
+    <li>No hay gastos fijos</li>
+{% endfor %}
+</ul>
+
+</body>
+</html>

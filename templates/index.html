@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestor de gastos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="header">
+    <h1>Cobro poco y gasto mucho</h1>
+
+    <div style="position:absolute; top:20px; right:20px; font-size:0.9rem;">
+        👤 {{ session.usuario }} |
+        <a href="/logout">Salir</a>
+    </div>
+
+    {% if mes_actual %}
+        <div class="estado-mes">
+            {% if mensaje.startswith("Mes actual") %}
+                MES ACTUAL · {{ mes_actual }}
+            {% else %}
+                HISTORIAL · {{ mes_actual }}
+            {% endif %}
+        </div>
+    {% endif %}
+</header>
+
+{% with mensajes = get_flashed_messages() %}
+  {% if mensajes %}
+    <div style="padding: 20px; color: #ff8a80;">
+      {% for m in mensajes %}
+        ⚠️ {{ m }}<br>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+{% if not mes_actual %}
+
+<!-- =====================
+     SIN MES CREADO
+===================== -->
+<div class="section">
+    <div class="card">
+        <h2>👋 Bienvenido</h2>
+        <p>No hay ningún mes creado todavía.</p>
+        <p><strong>Crea un mes para empezar a usar la aplicación.</strong></p>
+
+        <form method="post" action="/crear_mes">
+            <input name="nombre" placeholder="Ej: Marzo 2026" required>
+            <input name="ingreso" type="number" step="0.01" placeholder="Ingreso" required>
+            <button>Crear mes</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>⚙️ Gastos fijos</h2>
+        <p><a href="/gastos_fijos">Gestionar gastos fijos</a></p>
+        <p style="opacity:0.8;">
+            Los gastos fijos se aplicarán automáticamente
+            cuando crees un mes.
+        </p>
+    </div>
+</div>
+
+{% else %}
+
+<!-- =====================
+     CON MES ACTIVO
+===================== -->
+
+<div class="top-grid">
+
+    <!-- RESUMEN -->
+    <div class="card">
+        <h2>Resumen del mes</h2>
+
+        <div class="resumen-grid">
+            <div class="resumen-item ingreso">
+                <span>INGRESO</span>
+                <strong>{{ resumen.ingreso }} €</strong>
+            </div>
+
+            <div class="resumen-item fijos">
+                <span>GASTOS FIJOS</span>
+                <strong>{{ resumen.total_fijos }} €</strong>
+            </div>
+
+            <div class="resumen-item saldo">
+                <span>SALDO</span>
+                <strong>{{ resumen.saldo }} €</strong>
+            </div>
+
+            <div class="resumen-item variables">
+                <span>GASTOS VARIABLES</span>
+                <strong>{{ resumen.total_variables }} €</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTROL DE MESES -->
+    <div class="card">
+        <h2>Meses</h2>
+
+        <form method="post" action="/cambiar_mes">
+            <select name="mes">
+                {% for nombre in meses %}
+                    <option value="{{ nombre }}"
+                        {% if nombre == mes_actual %}selected{% endif %}>
+                        {{ nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button>Cambiar mes</button>
+        </form>
+
+        <form method="post" action="/crear_mes">
+            <input name="nombre" placeholder="Ej: Marzo 2026" required>
+            <input name="ingreso" type="number" step="0.01" placeholder="Ingreso" required>
+            <button>Crear mes</button>
+        </form>
+    </div>
+
+</div>
+
+<div class="section">
+
+    <div class="card">
+        <h2>⚙️ Gastos fijos</h2>
+        <p><a href="/gastos_fijos">Gestionar gastos fijos</a></p>
+    </div>
+
+    <div class="card">
+        <h2>🧾 Gastos variables</h2>
+
+        <form method="post" action="/añadir_gasto_variable">
+            <input name="descripcion" placeholder="Concepto" required>
+            <input name="importe" type="number" step="0.01" placeholder="Importe" required>
+
+            <select name="dia">
+                {% for d in range(1, 32) %}
+                    {% set dd = "%02d"|format(d) %}
+                    <option value="{{ dd }}" {% if dd == dia_hoy %}selected{% endif %}>
+                        {{ dd }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <select name="mes">
+                {% for m in range(1, 13) %}
+                    {% set mm = "%02d"|format(m) %}
+                    <option value="{{ mm }}" {% if mm == mes_hoy %}selected{% endif %}>
+                        {{ mm }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button>Añadir gasto</button>
+        </form>
+
+        <ul>
+        {% for g in gastos %}
+            <li>
+                {{ g.fecha }} — {{ g.descripcion }} — {{ g.importe }} €
+                <a href="/editar_gasto_variable/{{ loop.index0 }}">✏️</a>
+                <a href="/eliminar_gasto_variable/{{ loop.index0 }}">❌</a>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+
+</div>
+
+<footer class="footer">
+    <a href="/exportar_csv">CSV</a> ·
+    <a href="/exportar_excel">Excel</a>
+</footer>
+
+{% endif %}
+
+</body>
+</html>

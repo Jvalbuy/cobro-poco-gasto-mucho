@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="section">
+    <div class="card" style="max-width: 400px; margin: 100px auto;">
+        <h2>Crear cuenta</h2>
+
+        {% with mensajes = get_flashed_messages() %}
+          {% if mensajes %}
+            <p style="color:#ff8a80;">{{ mensajes[0] }}</p>
+          {% endif %}
+        {% endwith %}
+
+        <form method="post">
+            <input name="usuario" placeholder="Usuario" required>
+            <input name="password" type="password" placeholder="Contraseña" required>
+            <button>Crear cuenta</button>
+        </form>
+
+        <p style="margin-top:15px;">
+            ¿Ya tienes cuenta?
+            <a href="/login">Inicia sesión</a>
+        </p>
+    </div>
+</div>
+
+</body>
+</html>

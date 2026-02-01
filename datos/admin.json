@@ -1,0 +1,11 @@
+{
+    "mes_actual": "FEBRERO",
+    "gastos_fijos": [],
+    "meses": {
+        "FEBRERO": {
+            "ingreso": 1630.0,
+            "gastos_fijos": [],
+            "gastos_variables": []
+        }
+    }
+}
