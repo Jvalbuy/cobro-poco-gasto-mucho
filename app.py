@@ -11,7 +11,11 @@ import os
 # =========================
 # USUARIOS
 # =========================
-ARCHIVO_USUARIOS = "usuarios.json"
+BASE_PATH = "/data"
+ARCHIVO_USUARIOS = os.path.join(BASE_PATH, "usuarios.json")
+
+os.makedirs(BASE_PATH, exist_ok=True)
+
 
 
 def cargar_usuarios():
